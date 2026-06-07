@@ -35,6 +35,7 @@ function Dashboard() {
   const [forwardTarget, setForwardTarget] = useState<Feedback | null>(null);
   const [doneTarget, setDoneTarget] = useState<Feedback | null>(null);
   const [replyTarget, setReplyTarget] = useState<Feedback | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const previousFeedbacksRef = useRef<Feedback[] | null>(null);
 
   const fetchFeedbacks = useCallback(
@@ -94,6 +95,32 @@ function Dashboard() {
     setDoneTarget(null);
     setReplyTarget(null);
     fetchFeedbacks(false, true);
+  }
+
+  async function handleDelete(feedback: Feedback) {
+    const confirmed = window.confirm(
+      `Delete feedback from ${feedback.client_name}? This cannot be undone.`,
+    );
+    if (!confirmed) return;
+
+    setDeletingId(feedback.id);
+    try {
+      const res = await fetch(`/api/feedbacks/${feedback.id}`, { method: "DELETE" });
+      if (!res.ok) throw new Error("Failed to delete feedback");
+
+      const updated = feedbacks.filter((f) => f.id !== feedback.id);
+      previousFeedbacksRef.current = updated;
+      setFeedbacks(updated);
+      if (forwardTarget?.id === feedback.id) setForwardTarget(null);
+      if (doneTarget?.id === feedback.id) setDoneTarget(null);
+      if (replyTarget?.id === feedback.id) setReplyTarget(null);
+      showSuccess("Task deleted");
+    } catch (error) {
+      console.error("Delete feedback error:", error);
+      showError("Something went wrong, please try again");
+    } finally {
+      setDeletingId(null);
+    }
   }
 
   const stats = getStats(feedbacks);
@@ -194,6 +221,8 @@ function Dashboard() {
                 onForward={setForwardTarget}
                 onDone={setDoneTarget}
                 onReply={setReplyTarget}
+                onDelete={handleDelete}
+                deleting={deletingId === feedback.id}
               />
             ))
           )}

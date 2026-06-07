@@ -14,6 +14,8 @@ type FeedbackCardProps = {
   onForward: (feedback: Feedback) => void;
   onDone: (feedback: Feedback) => void;
   onReply: (feedback: Feedback) => void;
+  onDelete: (feedback: Feedback) => void;
+  deleting?: boolean;
 };
 
 const URGENCY_LABEL: Record<Feedback["urgency"], string> = {
@@ -22,7 +24,14 @@ const URGENCY_LABEL: Record<Feedback["urgency"], string> = {
   low: "Low priority",
 };
 
-export function FeedbackCard({ feedback, onForward, onDone, onReply }: FeedbackCardProps) {
+export function FeedbackCard({
+  feedback,
+  onForward,
+  onDone,
+  onReply,
+  onDelete,
+  deleting = false,
+}: FeedbackCardProps) {
   const displayStatus = getDisplayStatus(feedback);
   const badge = STATUS_BADGE[displayStatus];
 
@@ -79,6 +88,16 @@ export function FeedbackCard({ feedback, onForward, onDone, onReply }: FeedbackC
 
         <div className="mt-5 flex items-center justify-between gap-3 border-t border-slate-100 pt-4">
           <CardAction feedback={feedback} onForward={onForward} onDone={onDone} onReply={onReply} />
+          <button
+            type="button"
+            onClick={() => onDelete(feedback)}
+            disabled={deleting}
+            className="inline-flex items-center gap-1.5 rounded-xl px-3 py-2 text-sm font-medium text-slate-400 transition-colors hover:bg-red-50 hover:text-red-600 disabled:opacity-50"
+            aria-label={`Delete feedback from ${feedback.client_name}`}
+          >
+            <TrashIcon />
+            {deleting ? "Deleting…" : "Delete"}
+          </button>
         </div>
       </div>
     </article>
@@ -140,4 +159,24 @@ function CardAction({
         </span>
       );
   }
+}
+
+function TrashIcon() {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M3 6h18" />
+      <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
+      <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />
+    </svg>
+  );
 }
