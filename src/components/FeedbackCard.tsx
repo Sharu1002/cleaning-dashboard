@@ -69,6 +69,10 @@ export function FeedbackCard({
           <p className="text-sm leading-relaxed text-slate-600">{feedback.full_feedback}</p>
         </div>
 
+        {(feedback.image_urls ?? []).length > 0 && (
+          <FeedbackImageThumbnails urls={feedback.image_urls ?? []} />
+        )}
+
         {feedback.internal_note && (
           <p className="mt-3 rounded-lg border border-dashed border-slate-200 bg-amber-50/50 px-3 py-2 text-sm italic text-slate-500">
             {feedback.internal_note}
@@ -159,6 +163,44 @@ function CardAction({
         </span>
       );
   }
+}
+
+function FeedbackImageThumbnails({ urls }: { urls: string[] }) {
+  const visible = urls.slice(0, 3);
+  const remaining = urls.length - visible.length;
+
+  return (
+    <div className="mt-3 flex flex-wrap items-center gap-2">
+      {visible.map((url, index) => (
+        <a
+          key={url}
+          href={url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="group relative overflow-hidden rounded-lg ring-1 ring-slate-200 transition-all hover:ring-blue-400"
+          title="Open full image"
+        >
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={url}
+            alt={`Attachment ${index + 1}`}
+            className="h-16 w-16 object-cover transition-transform group-hover:scale-105"
+          />
+        </a>
+      ))}
+      {remaining > 0 && (
+        <a
+          href={urls[3]}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex h-16 w-16 items-center justify-center rounded-lg bg-slate-100 text-xs font-semibold text-slate-600 ring-1 ring-slate-200 transition-colors hover:bg-slate-200 hover:text-slate-900"
+          title="Open another attachment"
+        >
+          +{remaining} more
+        </a>
+      )}
+    </div>
+  );
 }
 
 function TrashIcon() {

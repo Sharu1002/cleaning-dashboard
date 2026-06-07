@@ -18,6 +18,7 @@ export type Feedback = {
   replied_at: string | null;
   internal_note: string | null;
   confirmation_token: string | null;
+  image_urls: string[];
 };
 
 export type Cleaner = {

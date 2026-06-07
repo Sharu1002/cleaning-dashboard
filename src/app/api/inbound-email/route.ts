@@ -1,13 +1,22 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { NextRequest, NextResponse } from "next/server";
+import { uploadFeedbackImageAttachments } from "@/lib/feedback-images";
 import { supabase } from "@/lib/supabase-server";
 import type { Urgency } from "@/types";
+
+type PostmarkAttachment = {
+  Name: string;
+  Content: string;
+  ContentType: string;
+  ContentLength: number;
+};
 
 type PostmarkInboundEmail = {
   FromName: string;
   From: string;
   Subject: string;
   TextBody: string;
+  Attachments?: PostmarkAttachment[];
 };
 
 type ExtractedFeedback = {
@@ -56,7 +65,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = (await request.json()) as PostmarkInboundEmail;
-    const { FromName, From, Subject, TextBody } = body;
+    const { FromName, From, Subject, TextBody, Attachments } = body;
 
     const anthropic = new Anthropic();
     const message = await anthropic.messages.create({
@@ -84,6 +93,7 @@ ${TextBody ?? ""}`,
 
     const extracted = parseClaudeJson(textBlock.text);
     const confirmationToken = crypto.randomUUID();
+    const imageUrls = await uploadFeedbackImageAttachments(Attachments);
 
     const { error } = await supabase.from("feedbacks").insert({
       client_name: extracted.client_name,
@@ -93,6 +103,7 @@ ${TextBody ?? ""}`,
       urgency: extracted.urgency,
       status: "new",
       confirmation_token: confirmationToken,
+      image_urls: imageUrls,
     });
 
     if (error) {
