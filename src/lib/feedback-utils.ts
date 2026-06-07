@@ -1,6 +1,6 @@
 import type { Feedback, Status } from "@/types";
 
-export type Filter = "all" | Status | "overdue";
+export type Filter = "all" | "open" | Status | "overdue";
 
 const HOUR_MS = 60 * 60 * 1000;
 const DAY_MS = 24 * HOUR_MS;
@@ -29,6 +29,7 @@ export function getDisplayStatus(feedback: Feedback): Status | "overdue" {
 
 export function filterFeedbacks(feedbacks: Feedback[], filter: Filter): Feedback[] {
   if (filter === "all") return feedbacks;
+  if (filter === "open") return feedbacks.filter((f) => f.status !== "replied");
   if (filter === "overdue") return feedbacks.filter(isOverdue);
   return feedbacks.filter((f) => f.status === filter);
 }
@@ -64,12 +65,35 @@ export function getStats(feedbacks: Feedback[]) {
   };
 }
 
-export const STATUS_BADGE: Record<Status | "overdue", { label: string; className: string }> = {
-  new: { label: "New", className: "bg-amber-100 text-amber-800 border-amber-200" },
-  forwarded: { label: "Forwarded", className: "bg-blue-100 text-blue-800 border-blue-200" },
-  done: { label: "Done", className: "bg-green-100 text-green-800 border-green-200" },
-  replied: { label: "Replied", className: "bg-gray-100 text-gray-600 border-gray-200" },
-  overdue: { label: "Overdue", className: "bg-red-100 text-red-800 border-red-200" },
+export const STATUS_BADGE: Record<
+  Status | "overdue",
+  { label: string; className: string; accent: string }
+> = {
+  new: {
+    label: "New",
+    className: "bg-amber-50 text-amber-800 ring-1 ring-amber-200/80",
+    accent: "border-l-amber-400",
+  },
+  forwarded: {
+    label: "Forwarded",
+    className: "bg-blue-50 text-blue-800 ring-1 ring-blue-200/80",
+    accent: "border-l-blue-500",
+  },
+  done: {
+    label: "Done",
+    className: "bg-emerald-50 text-emerald-800 ring-1 ring-emerald-200/80",
+    accent: "border-l-emerald-500",
+  },
+  replied: {
+    label: "Replied",
+    className: "bg-slate-100 text-slate-600 ring-1 ring-slate-200/80",
+    accent: "border-l-slate-400",
+  },
+  overdue: {
+    label: "Overdue",
+    className: "bg-red-50 text-red-800 ring-1 ring-red-200/80",
+    accent: "border-l-red-500",
+  },
 };
 
 export const URGENCY_DOT: Record<Feedback["urgency"], string> = {

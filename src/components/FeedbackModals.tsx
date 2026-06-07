@@ -75,20 +75,20 @@ export function ForwardModal({
     <ModalShell title="Forward to cleaner" onClose={onClose}>
       <div className="space-y-4">
         <div>
-          <p className="text-sm font-medium text-gray-900">{feedback.client_name}</p>
-          <p className="mt-1 text-sm font-semibold text-gray-800">{feedback.summary}</p>
-          <p className="mt-2 text-sm text-gray-600">{feedback.full_feedback}</p>
+          <p className="text-sm font-medium text-slate-900">{feedback.client_name}</p>
+          <p className="mt-1 text-sm font-semibold text-slate-800">{feedback.summary}</p>
+          <p className="mt-2 text-sm text-slate-600">{feedback.full_feedback}</p>
         </div>
 
         <div>
-          <label htmlFor="cleaner" className="mb-1 block text-sm font-medium text-gray-700">
+          <label htmlFor="cleaner" className="mb-1 block text-sm font-medium text-slate-700">
             Select cleaner
           </label>
           <select
             id="cleaner"
             value={selectedCleanerId}
             onChange={(e) => setSelectedCleanerId(e.target.value)}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
           >
             <option value="">Choose a cleaner…</option>
             {cleaners.map((cleaner) => (
@@ -100,7 +100,7 @@ export function ForwardModal({
         </div>
 
         <div>
-          <label htmlFor="whatsapp-message" className="mb-1 block text-sm font-medium text-gray-700">
+          <label htmlFor="whatsapp-message" className="mb-1 block text-sm font-medium text-slate-700">
             WhatsApp message
           </label>
           <textarea
@@ -109,7 +109,7 @@ export function ForwardModal({
             onChange={(e) => setMessage(e.target.value)}
             rows={5}
             disabled={!selectedCleaner}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:bg-gray-50"
+            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 disabled:bg-slate-50"
           />
         </div>
 
@@ -117,7 +117,7 @@ export function ForwardModal({
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+            className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
           >
             Cancel
           </button>
@@ -189,19 +189,19 @@ export function DoneModal({
     <ModalShell title="Mark as done" onClose={onClose}>
       <div className="space-y-4">
         <div>
-          <p className="text-sm text-gray-600">
-            Client: <span className="font-medium text-gray-900">{feedback.client_name}</span>
+          <p className="text-sm text-slate-700">
+            Client: <span className="font-medium text-slate-900">{feedback.client_name}</span>
           </p>
-          <p className="mt-1 text-sm text-gray-600">
+          <p className="mt-1 text-sm text-slate-700">
             Cleaner:{" "}
-            <span className="font-medium text-gray-900">
+            <span className="font-medium text-slate-900">
               {feedback.assigned_cleaner ?? "Unassigned"}
             </span>
           </p>
         </div>
 
         <div>
-          <label htmlFor="internal-note" className="mb-1 block text-sm font-medium text-gray-700">
+          <label htmlFor="internal-note" className="mb-1 block text-sm font-medium text-slate-700">
             Internal note (optional)
           </label>
           <textarea
@@ -210,7 +210,7 @@ export function DoneModal({
             onChange={(e) => setInternalNote(e.target.value)}
             rows={4}
             placeholder="Add any internal notes…"
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
           />
         </div>
 
@@ -218,7 +218,7 @@ export function DoneModal({
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+            className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
           >
             Cancel
           </button>
@@ -292,15 +292,15 @@ export function ReplyModal({
   return (
     <ModalShell title="Reply to customer" onClose={onClose}>
       <div className="space-y-4">
-        <p className="text-sm text-gray-600">
+        <p className="text-sm text-slate-700">
           To:{" "}
-          <span className="font-medium text-gray-900">
+          <span className="font-medium text-slate-900">
             {feedback.client_email ?? "No email on file"}
           </span>
         </p>
 
         <div>
-          <label htmlFor="email-body" className="mb-1 block text-sm font-medium text-gray-700">
+          <label htmlFor="email-body" className="mb-1 block text-sm font-medium text-slate-700">
             Email message
           </label>
           <textarea
@@ -308,7 +308,7 @@ export function ReplyModal({
             value={emailBody}
             onChange={(e) => setEmailBody(e.target.value)}
             rows={8}
-            className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
           />
         </div>
 
@@ -316,14 +316,14 @@ export function ReplyModal({
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+            className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
           >
             Cancel
           </button>
           <button
             type="button"
             onClick={handleCopy}
-            className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+            className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
           >
             Copy email
           </button>
@@ -331,7 +331,7 @@ export function ReplyModal({
             type="button"
             onClick={handleConfirm}
             disabled={submitting}
-            className="rounded-lg bg-gray-800 px-4 py-2 text-sm font-medium text-white hover:bg-gray-900 disabled:cursor-not-allowed disabled:opacity-50"
+            className="rounded-lg bg-blue-700 px-4 py-2 text-sm font-medium text-white hover:bg-blue-800 disabled:cursor-not-allowed disabled:opacity-50"
           >
             {submitting ? "Saving…" : "Mark as replied"}
           </button>
@@ -352,14 +352,14 @@ function ModalShell({
 }) {
   return (
     <div className="fixed inset-0 z-50 flex items-end justify-center p-4 sm:items-center">
-      <div className="absolute inset-0 bg-black/40" onClick={onClose} aria-hidden="true" />
-      <div className="relative z-10 w-full max-w-lg rounded-xl border border-gray-200 bg-white p-6 shadow-lg">
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
+      <div className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm" onClick={onClose} aria-hidden="true" />
+      <div className="relative z-10 w-full max-w-lg rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl">
+        <div className="mb-5 flex items-center justify-between">
+          <h2 className="text-lg font-semibold tracking-tight text-slate-900">{title}</h2>
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+            className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700"
             aria-label="Close"
           >
             ✕

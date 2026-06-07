@@ -8,12 +8,12 @@ function htmlPage(title: string, body: string) {
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>${title} — Sparkling Clean Co.</title>
+  <title>${title} — Feedback Tracker</title>
 </head>
 <body style="margin:0;padding:40px 20px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#fff;color:#1a1a1a;display:flex;align-items:center;justify-content:center;min-height:100vh;box-sizing:border-box;">
   <div style="max-width:480px;text-align:center;">
     ${body}
-    <p style="margin:32px 0 0;font-size:14px;color:#888;">Sparkling Clean Co.</p>
+    <p style="margin:32px 0 0;font-size:14px;color:#888;">Feedback Tracker</p>
   </div>
 </body>
 </html>`;

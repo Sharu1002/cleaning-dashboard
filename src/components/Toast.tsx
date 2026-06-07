@@ -82,13 +82,13 @@ function ToastItem({ toast }: { toast: Toast }) {
 
   const styles =
     toast.type === "success"
-      ? "border-green-200 bg-green-50 text-green-800"
-      : "border-red-200 bg-red-50 text-red-800";
+      ? "border-emerald-200/80 bg-white text-emerald-800 ring-1 ring-emerald-100"
+      : "border-red-200/80 bg-white text-red-800 ring-1 ring-red-100";
 
   return (
     <div
       role="status"
-      className={`rounded-lg border px-4 py-3 text-sm font-medium shadow-md transition-all duration-300 ${styles} ${
+      className={`rounded-xl border px-4 py-3 text-sm font-medium shadow-lg backdrop-blur-sm transition-all duration-300 ${styles} ${
         visible ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"
       }`}
     >

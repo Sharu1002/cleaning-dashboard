@@ -16,56 +16,80 @@ type FeedbackCardProps = {
   onReply: (feedback: Feedback) => void;
 };
 
+const URGENCY_LABEL: Record<Feedback["urgency"], string> = {
+  high: "High priority",
+  medium: "Medium priority",
+  low: "Low priority",
+};
+
 export function FeedbackCard({ feedback, onForward, onDone, onReply }: FeedbackCardProps) {
   const displayStatus = getDisplayStatus(feedback);
   const badge = STATUS_BADGE[displayStatus];
 
   return (
-    <article className="rounded-xl border border-gray-200 bg-white p-5">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div className="flex items-center gap-2">
+    <article
+      className={`overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-sm transition-shadow hover:shadow-md border-l-4 ${badge.accent}`}
+    >
+      <div className="p-5 sm:p-6">
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-2.5">
+              <span
+                className={`h-2 w-2 shrink-0 rounded-full ring-2 ring-white ${URGENCY_DOT[feedback.urgency]}`}
+                title={URGENCY_LABEL[feedback.urgency]}
+              />
+              <h3 className="truncate text-lg font-semibold tracking-tight text-slate-900">
+                {feedback.client_name}
+              </h3>
+            </div>
+            {feedback.client_email && (
+              <p className="mt-1 truncate pl-5 text-sm text-slate-500">{feedback.client_email}</p>
+            )}
+          </div>
           <span
-            className={`h-2.5 w-2.5 shrink-0 rounded-full ${URGENCY_DOT[feedback.urgency]}`}
-            title={`${feedback.urgency} urgency`}
-          />
-          <h3 className="text-base font-semibold text-gray-900">{feedback.client_name}</h3>
+            className={`shrink-0 rounded-full px-3 py-1 text-xs font-semibold ${badge.className}`}
+          >
+            {badge.label}
+          </span>
         </div>
-        <span
-          className={`rounded-full border px-2.5 py-0.5 text-xs font-medium ${badge.className}`}
-        >
-          {badge.label}
-        </span>
-      </div>
 
-      {feedback.client_email && (
-        <p className="mt-2 text-sm text-gray-500">{feedback.client_email}</p>
-      )}
+        <div className="mt-4 space-y-2 rounded-xl bg-slate-50 px-4 py-3">
+          {feedback.summary && (
+            <p className="text-sm font-semibold leading-snug text-slate-800">{feedback.summary}</p>
+          )}
+          <p className="text-sm leading-relaxed text-slate-600">{feedback.full_feedback}</p>
+        </div>
 
-      <div className="mt-3 space-y-2">
-        {feedback.summary && (
-          <p className="text-sm font-semibold text-gray-800">{feedback.summary}</p>
+        {feedback.internal_note && (
+          <p className="mt-3 rounded-lg border border-dashed border-slate-200 bg-amber-50/50 px-3 py-2 text-sm italic text-slate-500">
+            {feedback.internal_note}
+          </p>
         )}
-        <p className="text-sm leading-relaxed text-gray-600">{feedback.full_feedback}</p>
-      </div>
 
-      {feedback.internal_note && (
-        <p className="mt-3 text-sm italic text-gray-400">{feedback.internal_note}</p>
-      )}
+        <div className="mt-4 flex flex-wrap gap-2">
+          <MetaChip>Created {formatDate(feedback.created_at)}</MetaChip>
+          {feedback.assigned_cleaner && (
+            <MetaChip>Assigned to {feedback.assigned_cleaner}</MetaChip>
+          )}
+          <MetaChip>
+            {daysSince(feedback.created_at)} day{daysSince(feedback.created_at) !== 1 ? "s" : ""}{" "}
+            ago
+          </MetaChip>
+        </div>
 
-      <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-gray-500">
-        <span>Created {formatDate(feedback.created_at)}</span>
-        {feedback.assigned_cleaner && (
-          <span>Assigned to {feedback.assigned_cleaner}</span>
-        )}
-        <span>
-          {daysSince(feedback.created_at)} day{daysSince(feedback.created_at) !== 1 ? "s" : ""} ago
-        </span>
-      </div>
-
-      <div className="mt-4 border-t border-gray-100 pt-4">
-        <CardAction feedback={feedback} onForward={onForward} onDone={onDone} onReply={onReply} />
+        <div className="mt-5 flex items-center justify-between gap-3 border-t border-slate-100 pt-4">
+          <CardAction feedback={feedback} onForward={onForward} onDone={onDone} onReply={onReply} />
+        </div>
       </div>
     </article>
+  );
+}
+
+function MetaChip({ children }: { children: React.ReactNode }) {
+  return (
+    <span className="inline-flex items-center rounded-md bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600">
+      {children}
+    </span>
   );
 }
 
@@ -75,13 +99,16 @@ function CardAction({
   onDone,
   onReply,
 }: FeedbackCardProps) {
+  const btn =
+    "inline-flex items-center justify-center rounded-xl px-4 py-2.5 text-sm font-semibold shadow-sm transition-all active:scale-[0.98]";
+
   switch (feedback.status) {
     case "new":
       return (
         <button
           type="button"
           onClick={() => onForward(feedback)}
-          className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700"
+          className={`${btn} bg-blue-600 text-white hover:bg-blue-700 hover:shadow`}
         >
           Forward to cleaner
         </button>
@@ -91,7 +118,7 @@ function CardAction({
         <button
           type="button"
           onClick={() => onDone(feedback)}
-          className="rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white hover:bg-green-700"
+          className={`${btn} bg-emerald-600 text-white hover:bg-emerald-700 hover:shadow`}
         >
           Mark as done
         </button>
@@ -101,12 +128,16 @@ function CardAction({
         <button
           type="button"
           onClick={() => onReply(feedback)}
-          className="rounded-lg bg-gray-800 px-4 py-2 text-sm font-medium text-white hover:bg-gray-900"
+          className={`${btn} bg-slate-800 text-white hover:bg-slate-900 hover:shadow`}
         >
           Reply to customer
         </button>
       );
     case "replied":
-      return <span className="text-sm font-medium text-gray-400">Closed</span>;
+      return (
+        <span className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-400">
+          <span className="text-emerald-500">✓</span> Closed
+        </span>
+      );
   }
 }
