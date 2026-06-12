@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { EmptyState } from "@/components/EmptyState";
 import { FeedbackCard } from "@/components/FeedbackCard";
@@ -35,7 +36,6 @@ function Dashboard() {
   const [forwardTarget, setForwardTarget] = useState<Feedback | null>(null);
   const [doneTarget, setDoneTarget] = useState<Feedback | null>(null);
   const [replyTarget, setReplyTarget] = useState<Feedback | null>(null);
-  const [deletingId, setDeletingId] = useState<string | null>(null);
   const previousFeedbacksRef = useRef<Feedback[] | null>(null);
 
   const fetchFeedbacks = useCallback(
@@ -97,32 +97,6 @@ function Dashboard() {
     fetchFeedbacks(false, true);
   }
 
-  async function handleDelete(feedback: Feedback) {
-    const confirmed = window.confirm(
-      `Delete feedback from ${feedback.client_name}? This cannot be undone.`,
-    );
-    if (!confirmed) return;
-
-    setDeletingId(feedback.id);
-    try {
-      const res = await fetch(`/api/feedbacks/${feedback.id}`, { method: "DELETE" });
-      if (!res.ok) throw new Error("Failed to delete feedback");
-
-      const updated = feedbacks.filter((f) => f.id !== feedback.id);
-      previousFeedbacksRef.current = updated;
-      setFeedbacks(updated);
-      if (forwardTarget?.id === feedback.id) setForwardTarget(null);
-      if (doneTarget?.id === feedback.id) setDoneTarget(null);
-      if (replyTarget?.id === feedback.id) setReplyTarget(null);
-      showSuccess("Task deleted");
-    } catch (error) {
-      console.error("Delete feedback error:", error);
-      showError("Something went wrong, please try again");
-    } finally {
-      setDeletingId(null);
-    }
-  }
-
   const stats = getStats(feedbacks);
   const filtered = filterFeedbacks(feedbacks, filter);
 
@@ -141,15 +115,23 @@ function Dashboard() {
               <p className="text-sm text-blue-200">Feedback tracker</p>
             </div>
           </div>
-          <button
-            type="button"
-            onClick={() => fetchFeedbacks(true)}
-            disabled={refreshing}
-            className="flex items-center gap-2 rounded-xl bg-white/10 px-3.5 py-2 text-sm font-medium text-white ring-1 ring-white/20 transition-all hover:bg-white/20 disabled:opacity-60"
-          >
-            <RefreshIcon spinning={refreshing} />
-            <span className="hidden sm:inline">Refresh</span>
-          </button>
+          <div className="flex items-center gap-2">
+            <Link
+              href="/rankings"
+              className="rounded-xl bg-white/10 px-3.5 py-2 text-sm font-medium text-white ring-1 ring-white/20 transition-all hover:bg-white/20"
+            >
+              Rankings
+            </Link>
+            <button
+              type="button"
+              onClick={() => fetchFeedbacks(true)}
+              disabled={refreshing}
+              className="flex items-center gap-2 rounded-xl bg-white/10 px-3.5 py-2 text-sm font-medium text-white ring-1 ring-white/20 transition-all hover:bg-white/20 disabled:opacity-60"
+            >
+              <RefreshIcon spinning={refreshing} />
+              <span className="hidden sm:inline">Refresh</span>
+            </button>
+          </div>
         </div>
       </header>
 
@@ -221,8 +203,6 @@ function Dashboard() {
                 onForward={setForwardTarget}
                 onDone={setDoneTarget}
                 onReply={setReplyTarget}
-                onDelete={handleDelete}
-                deleting={deletingId === feedback.id}
               />
             ))
           )}
