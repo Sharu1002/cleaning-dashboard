@@ -34,6 +34,36 @@ export function filterFeedbacks(feedbacks: Feedback[], filter: Filter): Feedback
   return feedbacks.filter((f) => f.status === filter);
 }
 
+export function normalizeClientName(name: string): string {
+  return name.trim().toLowerCase();
+}
+
+export function filterByClientName(
+  feedbacks: Feedback[],
+  clientKey: string | null,
+): Feedback[] {
+  if (!clientKey) return feedbacks;
+  return feedbacks.filter(
+    (feedback) => normalizeClientName(feedback.client_name) === clientKey,
+  );
+}
+
+export function getClientNameOptions(
+  feedbacks: Feedback[],
+): { key: string; label: string }[] {
+  const options = new Map<string, string>();
+
+  for (const feedback of feedbacks) {
+    const key = normalizeClientName(feedback.client_name);
+    if (!key || options.has(key)) continue;
+    options.set(key, feedback.client_name.trim());
+  }
+
+  return Array.from(options.entries())
+    .map(([key, label]) => ({ key, label }))
+    .sort((a, b) => a.label.localeCompare(b.label));
+}
+
 export function daysSince(dateStr: string): number {
   return Math.floor((Date.now() - new Date(dateStr).getTime()) / DAY_MS);
 }

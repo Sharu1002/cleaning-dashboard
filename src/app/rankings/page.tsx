@@ -135,9 +135,12 @@ export default function RankingsPage() {
                     </span>
                     <div className="min-w-0 flex-1">
                       <div className="flex flex-wrap items-center gap-2">
-                        <h3 className="text-base font-semibold text-slate-900">
+                        <Link
+                          href={`/?client=${encodeURIComponent(location.client_name)}`}
+                          className="text-base font-semibold text-slate-900 hover:text-blue-700 hover:underline"
+                        >
                           {location.client_name}
-                        </h3>
+                        </Link>
                         <span
                           className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${badge.className}`}
                         >

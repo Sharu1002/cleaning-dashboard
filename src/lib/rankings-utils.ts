@@ -1,4 +1,4 @@
-import { daysSince } from "@/lib/feedback-utils";
+import { daysSince, normalizeClientName } from "@/lib/feedback-utils";
 import type { Feedback } from "@/types";
 
 export type TimeRange = "30" | "90" | "all";
@@ -39,7 +39,7 @@ export function buildLocationRankings(feedbacks: Feedback[]): LocationRanking[] 
   const groups = new Map<string, Feedback[]>();
 
   for (const feedback of feedbacks) {
-    const key = feedback.client_name.trim().toLowerCase();
+    const key = normalizeClientName(feedback.client_name);
     if (!key) continue;
 
     const existing = groups.get(key) ?? [];

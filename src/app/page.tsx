@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { EmptyState } from "@/components/EmptyState";
 import { FeedbackCard } from "@/components/FeedbackCard";
 import { FeedbackSkeleton } from "@/components/FeedbackSkeleton";
@@ -10,8 +11,11 @@ import { ToastProvider, useToast } from "@/components/Toast";
 import {
   FILTER_OPTIONS,
   type Filter,
+  filterByClientName,
   filterFeedbacks,
+  getClientNameOptions,
   getStats,
+  normalizeClientName,
 } from "@/lib/feedback-utils";
 import { getFeedbackChangeNotifications } from "@/lib/feedback-notifications";
 import type { Cleaner, Feedback } from "@/types";
@@ -21,12 +25,31 @@ const REFRESH_INTERVAL_MS = 30_000;
 export default function Home() {
   return (
     <ToastProvider>
-      <Dashboard />
+      <Suspense fallback={<DashboardFallback />}>
+        <Dashboard />
+      </Suspense>
     </ToastProvider>
   );
 }
 
+function DashboardFallback() {
+  return (
+    <div className="min-h-screen bg-[#f0f5fa]">
+      <header className="bg-blue-800 shadow-md">
+        <div className="mx-auto max-w-5xl px-4 py-5 sm:px-6">
+          <h1 className="text-xl font-bold text-white">KNK Palvelut Oy</h1>
+        </div>
+      </header>
+      <main className="mx-auto max-w-5xl px-4 py-8">
+        <FeedbackSkeleton />
+      </main>
+    </div>
+  );
+}
+
 function Dashboard() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
   const { showSuccess, showError } = useToast();
   const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
   const [cleaners, setCleaners] = useState<Cleaner[]>([]);
@@ -97,8 +120,30 @@ function Dashboard() {
     fetchFeedbacks(false, true);
   }
 
-  const stats = getStats(feedbacks);
-  const filtered = filterFeedbacks(feedbacks, filter);
+  const clientOptions = getClientNameOptions(feedbacks);
+  const clientParam = searchParams.get("client");
+  const clientFilter = clientParam ? normalizeClientName(clientParam) : null;
+  const clientFiltered = filterByClientName(feedbacks, clientFilter);
+  const stats = getStats(clientFiltered);
+  const filtered = filterFeedbacks(clientFiltered, filter);
+  const activeClientLabel =
+    clientOptions.find((option) => option.key === clientFilter)?.label ??
+    clientParam?.trim() ??
+    null;
+
+  function updateClientFilter(clientKey: string | null) {
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (clientKey) {
+      const label = clientOptions.find((option) => option.key === clientKey)?.label;
+      if (label) params.set("client", label);
+    } else {
+      params.delete("client");
+    }
+
+    const query = params.toString();
+    router.replace(query ? `/?${query}` : "/", { scroll: false });
+  }
 
   return (
     <div className="min-h-screen bg-[#f0f5fa]">
@@ -170,6 +215,35 @@ function Dashboard() {
 
         <div className="mt-6 rounded-2xl border border-slate-200/80 bg-white p-3 shadow-sm sm:p-4">
           <p className="mb-3 px-1 text-xs font-semibold uppercase tracking-wider text-slate-400">
+            Filter by location
+          </p>
+          <div className="flex flex-wrap items-center gap-2">
+            <select
+              value={clientFilter ?? ""}
+              onChange={(e) => updateClientFilter(e.target.value || null)}
+              className="rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-sm font-medium text-slate-700 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            >
+              <option value="">All locations</option>
+              {clientOptions.map((option) => (
+                <option key={option.key} value={option.key}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+            {clientFilter && (
+              <button
+                type="button"
+                onClick={() => updateClientFilter(null)}
+                className="rounded-full bg-slate-100 px-3 py-1.5 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-200"
+              >
+                Clear location
+              </button>
+            )}
+          </div>
+        </div>
+
+        <div className="mt-4 rounded-2xl border border-slate-200/80 bg-white p-3 shadow-sm sm:p-4">
+          <p className="mb-3 px-1 text-xs font-semibold uppercase tracking-wider text-slate-400">
             Filter by status
           </p>
           <div className="flex flex-wrap gap-2">
@@ -191,10 +265,24 @@ function Dashboard() {
         </div>
 
         <div className="mt-6 space-y-4 sm:space-y-5">
+          {clientFilter && activeClientLabel && (
+            <p className="text-sm text-slate-500">
+              Showing feedback for{" "}
+              <span className="font-semibold text-slate-800">{activeClientLabel}</span>
+            </p>
+          )}
           {initialLoading ? (
             <FeedbackSkeleton />
           ) : filtered.length === 0 ? (
-            <EmptyState filter={filter} />
+            clientFilter ? (
+              <div className="rounded-2xl border border-dashed border-slate-200 bg-white px-6 py-16 text-center shadow-sm">
+                <p className="text-sm text-slate-500">
+                  No cases for this location with the current filters.
+                </p>
+              </div>
+            ) : (
+              <EmptyState filter={filter} />
+            )
           ) : (
             filtered.map((feedback) => (
               <FeedbackCard
